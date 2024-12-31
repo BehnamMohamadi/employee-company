@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { isDate, isNumeric, isMobilePhone } = require("validator");
+const { getIranProvinces } = require("../utils/iran-provinces");
 const employeeSchema = new Schema(
   {
     // systemاستان سکونت، نقش کارمند در شرکت(مدیر - کارمند)، تاریخ ثبت نام کارمند در
@@ -28,73 +29,64 @@ const employeeSchema = new Schema(
       default: "not-set",
       trim: true,
     },
+
     dateOfBirth: {
       type: Date,
-      required: [true, "date of birthday is required"],
+      required: [true, "date of birth is required"],
+      validate: {
+        validator: (value) => isDate(value),
+        message: "Invalid date format",
+      },
+    },
+
+    phoneNumber: {
+      type: [String],
+      required: [true, "phonenumber is required"],
+      unique: true,
       validate: {
         validator: (value) => {
-          return isDate(value, {
-            format: "YYYY/MM/DD",
-            strictMode: true,
-            delimiters: ["-"],
-          });
-        },
-      },
+          if (!value.length) return false;
 
-      phoneNumber: {
-        type: [String],
-        required: [true, "phonenumber is required"],
-        unique: true,
-        validate: {
-          validator: (value) => {
-            if (value.length) return false;
-            return value.every((phone) => isMobilePhone(phone, "fa-IR"));
-          },
-          message: "provide valid phone number and at least one phone number",
+          return value.every((phone) => isMobilePhone(phone, "fa-IR"));
         },
+        message: "provide valid phone number and at least one phone number",
       },
-      nationalId: {
-        type: String,
-        required: true,
-        unique: true,
-        minlength: [10, "nationalId must be atleast 10 number"],
-        maxlength: [10, "nationalId must be maximum 10 number"],
-        validate: {
-          validator: (value) => isNumeric(value),
-          message: "national id must be numbers only",
-        },
-        trim: true,
+    },
+
+    nationalId: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: [10, "nationalId must be atleast 10 number"],
+      maxlength: [10, "nationalId must be maximum 10 number"],
+      validate: {
+        validator: (value) => isNumeric(value),
+        message: "national id must be numbers only",
       },
-      province: {
-        type: String,
-        default: "not-set",
-        validate: async (value) => {
-          try {
-            const provinces = await getProvinces();
-            return provinces.includes(value);
-          } catch (err) {
-            throw err;
-          }
-        },
-        trim: true,
+      trim: true,
+    },
+    province: {
+      type: String,
+      default: "not-set",
+      validate: async (value) => {
+        try {
+          const provinces = await getIranProvinces();
+          return provinces.includes(value);
+        } catch (err) {
+          throw err;
+        }
       },
-      role: {
-        type: String,
-        enum: {
-          values: ["manager", "employee"],
-          message: "role must be eather manager or employee",
-        },
-        default: "employee",
-        trim: true,
-        lowercase: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: {
+        values: ["manager", "employee"],
+        message: "role must be eather manager or employee",
       },
-      company: {
-        type: String,
-        required: [true, "company is required."],
-        minlength: [2, "company must be atleast 3 characters"],
-        maxlength: [40, "company must be maximum 30 characters"],
-        trim: true,
-      },
+      default: "employee",
+      trim: true,
+      lowercase: true,
     },
   },
   { timestamps: true }

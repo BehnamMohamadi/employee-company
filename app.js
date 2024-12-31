@@ -1,6 +1,6 @@
 const express = require("express");
 const { connect } = require("mongoose");
-const { AppError } = require("./utils/App-Error");
+const { AppError } = require("./utils/app-error");
 const morgan = require("morgan");
 const appRouter = require("./routes/app-routes");
 
@@ -14,6 +14,7 @@ connect("mongodb://localhost:27017/corporate")
     console.log("database is disconnected");
     process.exit(1);
   });
+
 app.use(morgan("dev"));
 
 app.use(express.json({ limit: "10kb" }));
@@ -21,7 +22,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use("/", appRouter);
 
 app.all("*", (request, response, next) => {
-  return next(AppError(404, "not-found"));
+  next(new AppError(404, "not-found"));
 });
 
 app.use((err, request, response, next) => {
