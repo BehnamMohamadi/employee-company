@@ -8,7 +8,7 @@ const app = express();
 const host = "127.0.0.1";
 const port = 8000;
 
-connect("mongodb://localhost:27017/corporate")
+connect("mongodb://localhost:27017/corporate-employee")
   .then(() => console.log("database is connected"))
   .catch(() => {
     console.log("database is disconnected");

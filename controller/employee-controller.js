@@ -1,11 +1,11 @@
 const Employee = require("../models/employee-model");
 const { AppError } = require("../utils/app-error");
 const { getIranProvinces } = require("../utils/iran-provinces");
+const { ApiFeature } = require("../utils/api-feature");
 
 const checkData = async (request, response, next) => {
   try {
-    // Extract variables
-    const { province, phoneNumber, nationalId } = request.body;
+    const { province, phonenumber, nationalId } = request.body;
 
     // Province validation
     if (province === "not-set") {
@@ -18,22 +18,26 @@ const checkData = async (request, response, next) => {
 
     // National ID validation
     const checkNationalIdIsExist = await Employee.exists({ nationalId });
-    if (!!checkNationalIdIsExist) {
+    if (checkNationalIdIsExist) {
       return next(new AppError(400, "This national ID already exists"));
     }
 
     // Phone number validation
-    for (let phone of phoneNumber) {
+    const formattedPhoneNumbers = phonenumber.map((phone) => {
       if (phone.startsWith("0")) {
-        phone = `+98${phone.slice(1)}`;
+        return `+98${phone.slice(1)}`;
       }
+      return phone;
+    });
 
-      const checkPhoneNumberIsExist = await Employee.exists({ phoneNumber: phone });
-      if (!!checkPhoneNumberIsExist) {
+    for (let phone of formattedPhoneNumbers) {
+      const checkPhonenumberIsExist = await Employee.exists({ phonenumber: phone });
+      if (checkPhonenumberIsExist) {
         return next(new AppError(409, "Phone number already exists"));
       }
     }
 
+    request.body.phonenumber = formattedPhoneNumbers;
     next();
   } catch (error) {
     console.error("Error in checkData:", error);
@@ -55,6 +59,19 @@ const addEmployee = async (request, response, next) => {
   }
 };
 
+const showAllEmployees = async (request, response, next) => {
+  try {
+    const employeeModel = new ApiFeature(Employee.find({}), request.query);
+    employeeModel.limitFields().sort().paginate().filter();
+    const employees = await employeeModel.model;
 
+    const totalEmployees = employees.length;
 
-module.exports = { addEmployee, checkData,  };
+    response.status(200).json({ status: "success", data: { totalEmployees, employees } });
+  } catch (error) {
+    console.error("Error in showAllEmployees:", error);
+    next(error);
+  }
+};
+
+module.exports = { addEmployee, checkData, showAllEmployees };

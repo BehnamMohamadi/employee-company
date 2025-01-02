@@ -1,10 +1,10 @@
 const { Schema, model } = require("mongoose");
 const { isDate, isNumeric, isMobilePhone } = require("validator");
 const { getIranProvinces } = require("../utils/iran-provinces");
+
 const employeeSchema = new Schema(
   {
     // systemاستان سکونت، نقش کارمند در شرکت(مدیر - کارمند)، تاریخ ثبت نام کارمند در
-
     firstname: {
       type: String,
       required: [true, "firstname is required"],
@@ -39,17 +39,17 @@ const employeeSchema = new Schema(
       },
     },
 
-    phoneNumber: {
+    phonenumber: {
       type: [String],
-      required: [true, "phonenumber is required"],
+      required: [true, "phone number is required"],
       unique: true,
       validate: {
         validator: (value) => {
-          if (!value.length) return false;
-
-          return value.every((phone) => isMobilePhone(phone, "fa-IR"));
+          return (
+            value.length > 0 && value.every((phone) => isMobilePhone(phone, "fa-IR"))
+          );
         },
-        message: "provide valid phone number and at least one phone number",
+        message: "Provide a valid phone number and at least one phone number",
       },
     },
 
