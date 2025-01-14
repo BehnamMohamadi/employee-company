@@ -1,6 +1,6 @@
 const Employee = require("../models/employee-model");
 const { AppError } = require("../utils/app-error");
-const { getIranProvinces } = require("../utils/iran-provinces");
+const { getIranProvinces } = require("../utils/iran-provinces-states-city");
 const { ApiFeature } = require("../utils/api-feature");
 
 const checkData = async (request, response, next) => {
@@ -117,9 +117,9 @@ const checkEditEmployeeData = async (request, response, next) => {
 
     //// const checkPhoneNumberIsExist = employees.find((employee) =>
     ////   employee.phonenumber.some((phone) => phonenumber.includes(phone))
-   // // );
+    // // );
     //// if (checkPhoneNumberIsExist && checkPhoneNumberIsExist._id.toString() !== id) {
-   // //   return next(new AppError(409, "one of the phone numbers already exists"));
+    // //   return next(new AppError(409, "one of the phone numbers already exists"));
     //// }
 
     const employees = await Employee.find({});

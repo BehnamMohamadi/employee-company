@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { isDate, isNumeric, isMobilePhone } = require("validator");
-const { getIranProvinces } = require("../utils/iran-provinces");
+const { getIranProvinces } = require("../utils/iran-provinces-states-city");
 
 const employeeSchema = new Schema(
   {
