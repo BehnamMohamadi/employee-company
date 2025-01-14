@@ -4,11 +4,9 @@ function ApiFeature(model, query) {
 }
 
 ApiFeature.prototype.limitFields = function () {
-  let { fields = "," } = this.query;
+  let { fields = ",-__v" } = this.query;
 
   fields = fields.split(",").map((field) => field.trim());
-  fields = fields.filter((field) => field.startsWith("-"));
-  fields.push("-__v");
 
   this.model = this.model.select(fields.join(" "));
 
@@ -41,7 +39,7 @@ ApiFeature.prototype.filter = function () {
     (match) => `$${match}`
   );
 
-  this.model = this.model.find(J0SON.parse(filtersAsText));
+  this.model = this.model.find(JSON.parse(filtersAsText));
 
   return this;
 };

@@ -3,12 +3,25 @@ const {
   addEmployee,
   checkData,
   showAllEmployees,
+  editEmployee,
+  checkEditEmployeeData,
+  deleteEmployeeById,
 } = require("../controller/employee-controller");
-const { addEmployeeValidation } = require("../validation/employee-validator");
+const {
+  addEmployeeValidation,
+  editEmployeeValidator,
+} = require("../validation/employee-validator");
 const { validator } = require("../validation/validator");
 
-router.post("/add-employee", validator(addEmployeeValidation), checkData, addEmployee);
+router.post("/", validator(addEmployeeValidation), checkData, addEmployee);
+router.patch(
+  "/:id",
+  validator(editEmployeeValidator),
+  checkEditEmployeeData,
+  editEmployee
+);
+router.delete("/:id", deleteEmployeeById);
 
-router.get("/show-employees", showAllEmployees);
+router.get("/", showAllEmployees);
 
 module.exports = router;
